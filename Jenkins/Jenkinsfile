@@ -1,0 +1,31 @@
+//pipeline starts
+pipeline {
+
+   agent any
+   environment{
+        DOCKER_REPO = 'vivekbangare2492/sogan'
+   }
+   stages {
+    
+       stage('SCM clone') {
+            steps {
+                git 'https://github.com/spring-io/sagan.git'
+            }
+        }
+        stage('Build Artifact') {
+            steps {
+                sh "docker build -t ${env.DOCKER_REPO}:${env.BUILD_NUMBER} ."
+            }
+        }
+        stage('Push Image') {
+            steps {
+                sh "docker push ${env.DOCKER_REPO}:${env.BUILD_NUMBER}"
+            }
+        }
+        stage('Execute') {
+            steps {
+                sh "helm install sagan --set image.tag=${env.BUILD_NUMBER} sogan-helm"
+            }
+        }
+    }
+}
