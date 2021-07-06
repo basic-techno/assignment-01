@@ -14,6 +14,8 @@ pipeline {
         }
         stage('Build Artifact') {
             steps {
+		// considering the Dockerfile is in same folder and
+		// docker is installed on same machine
                 sh "docker build -t ${env.DOCKER_REPO}:${env.BUILD_NUMBER} ."
             }
         }
@@ -24,7 +26,12 @@ pipeline {
         }
         stage('Execute') {
             steps {
-                sh "helm install sagan --set image.tag=${env.BUILD_NUMBER} sogan-helm"
+		//considering the minikube is installed on same machine
+                
+ 		sh "helm install sagan --set image.tag=${env.BUILD_NUMBER} sogan-helm"
+
+		// if sagan  chart already deployed then we can used only upgrade command rather than install
+	        // sh "helm upgrade sagan --set image.tag=${env.BUILD_NUMBER} sogan-helm"
             }
         }
     }
